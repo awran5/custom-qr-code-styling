@@ -34,22 +34,40 @@ const tabs = [
   },
 ]
 
-const initialOpions = {
+const defaultBrand = 'https://raw.githubusercontent.com/awran5/custom-qr-code-styling/main/public/scanme.svg'
+
+interface Options {
+  size?: number
+  removeBrand?: boolean
+  image?: string
+  imageMargin?: number
+  mainShape?: DotType
+  shapeColor?: string
+  squareShape?: CornerSquareType
+  squareColor?: string
+  cornersDotShape?: CornerDotType
+  cornersDotColor?: string
+}
+
+const initialOpions: Options = {
   size: 1000,
   removeBrand: false,
-  image: window.location.origin + '/scanme.svg',
+  image: defaultBrand,
   imageMargin: 20,
-  mainShape: 'dots' as DotType,
+  mainShape: 'dots',
   shapeColor: '#6a1a4c',
-  squareShape: 'extra-rounded' as CornerSquareType,
+  squareShape: 'extra-rounded',
   squareColor: '#6a1a4c',
-  cornersDotShape: 'dot' as CornerDotType,
+  cornersDotShape: 'dot',
   cornersDotColor: '#dc3545',
 }
 
+const savedValues = localStorage.getItem('qr-code')
+const optionsValues: Options = savedValues ? JSON.parse(savedValues) : initialOpions
+
 function App() {
   const { qrCode, canvasRef } = useContext(AppContext)
-  const [options, setOptions] = useState(initialOpions)
+  const [options, setOptions] = useState(optionsValues)
   const [isSave, setSave] = useState(false)
   const [offcanvas, setOffcanvas] = useState(false)
   const [selectedTab, setSelectedTab] = useState(0)
@@ -73,7 +91,7 @@ function App() {
         console.error('Error: File is not supported.')
         setOptions((prev) => ({
           ...prev,
-          image: initialOpions.image,
+          image: defaultBrand,
         }))
       }
 
@@ -82,7 +100,7 @@ function App() {
         console.error('Error: Maximum file size is 2 MB')
         setOptions((prev) => ({
           ...prev,
-          image: initialOpions.image,
+          image: defaultBrand,
         }))
       }
 
@@ -102,7 +120,7 @@ function App() {
   const handleSave = () => {
     setSave(true)
     localStorage.setItem('qr-code', JSON.stringify(options))
-    setTimeout(() => setSave(false), 1000)
+    setTimeout(() => setSave(false), 500)
   }
 
   const handleSavedValues = () => {
@@ -125,7 +143,7 @@ function App() {
       uploadRef.current.value = ''
       setOptions((prev) => ({
         ...prev,
-        image: initialOpions.image,
+        image: defaultBrand,
       }))
     }
   }
