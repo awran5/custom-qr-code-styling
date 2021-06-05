@@ -14,7 +14,7 @@ function Header(): JSX.Element {
             target='_blank'
             rel='noopener noreferrer'
             className='btn btn-outline-warning'
-            href='https://github.com/awran5/qr-code'
+            href='https://github.com/awran5/custom-qr-code-styling'
           >
             GitHub
           </a>

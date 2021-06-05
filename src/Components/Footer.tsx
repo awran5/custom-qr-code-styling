@@ -9,8 +9,8 @@ function Footer(): JSX.Element {
           QR Code Styling JS library.
         </a>
         {' - '}{' '}
-        <a target='_blank' rel='noopener noreferrer' href='https://github.com/awran5/qr-code'>
-          source code
+        <a target='_blank' rel='noopener noreferrer' href='https://github.com/awran5/custom-qr-code-styling'>
+          Github
         </a>
       </p>
     </footer>
