@@ -2,8 +2,6 @@
 
 Generate a modern, styled and branded QR code for Free!. Build with React, based on [QR Code Styling](https://github.com/kozakdenys/qr-code-styling) JS library
 
-🤔 Base64 encoded images are good for tiny images, small icons, logos in emails, other than that, using base64 images might actually kill your [performance](https://bunny.net/blog/why-optimizing-your-images-with-base64-is-almost-always-a-bad-idea/).
-
 <hr />
 
 <p align="center">
