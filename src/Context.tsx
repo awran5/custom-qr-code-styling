@@ -14,16 +14,16 @@ interface ProviderProps {
 
 const qrCode = new QRCodeStyling({
   data: window.location.origin,
-  image: window.location.origin + '/scanme.svg',
+  image: `${window.location.origin}/scanme.svg`,
 
   imageOptions: {
-    crossOrigin: 'anonymous',
-  },
+    crossOrigin: 'anonymous'
+  }
 })
 
 export const AppContext = createContext<ContextProps>({
   qrCode,
-  canvasRef,
+  canvasRef
 })
 
 export default function ContextProvider({ children }: ProviderProps) {

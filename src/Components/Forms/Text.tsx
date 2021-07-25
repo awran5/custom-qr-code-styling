@@ -2,19 +2,19 @@ import React, { useState, useContext } from 'react'
 import { AppContext } from '../../Context'
 import Submit from '../Submit'
 
-const TextForm = (): JSX.Element => {
-  const [value, setValue] = useState('')
+const TextForm = () => {
+  const [values, setValues] = useState('')
   const { qrCode } = useContext(AppContext)
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(event.target.value)
+    setValues(event.target.value)
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     qrCode.update({
-      data: value,
+      data: values
     })
   }
 
@@ -25,7 +25,7 @@ const TextForm = (): JSX.Element => {
           id='text'
           className='form-control'
           name='text'
-          value={value}
+          value={values}
           cols={3}
           onChange={handleChange}
           placeholder='Add Text'

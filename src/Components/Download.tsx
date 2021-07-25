@@ -1,10 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { AppContext } from '../Context'
 
 const Download = (): JSX.Element => {
   const { qrCode } = useContext(AppContext)
 
-  const handleDownload = (ext: string) => qrCode.download(ext)
+  const handleDownload = useCallback((ext: string) => qrCode.download(ext), [qrCode])
 
   return (
     <div className='d-flex align-items-center pt-4'>

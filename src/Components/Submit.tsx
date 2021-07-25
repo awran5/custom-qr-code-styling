@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Submit = (): JSX.Element => {
+const Submit = () => {
   return (
     <button className='btn btn-dark' type='submit'>
       Generate

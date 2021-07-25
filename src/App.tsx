@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
-import { DotType, CornerSquareType, CornerDotType } from 'qr-code-styling/lib/types'
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import React, { useState, useEffect, useRef, useContext, useReducer } from 'react'
+import { DotType, CornerSquareType, CornerDotType } from 'qr-code-styling'
 import { AppContext } from './Context'
 import Header from './Components/Header'
 import Tabs from './Components/Tabs'
@@ -14,24 +15,24 @@ import Download from './Components/Download'
 const tabs = [
   {
     label: 'Text',
-    Component: TextForm,
+    Component: TextForm
   },
   {
     label: 'URL',
-    Component: UrlForm,
+    Component: UrlForm
   },
   {
     label: 'E-mail',
-    Component: EmailForm,
+    Component: EmailForm
   },
   {
     label: 'VCard',
-    Component: VCardForm,
+    Component: VCardForm
   },
   {
     label: 'WiFi',
-    Component: WiFiForm,
-  },
+    Component: WiFiForm
+  }
 ]
 
 const defaultBrand = 'https://raw.githubusercontent.com/awran5/custom-qr-code-styling/main/public/scanme.svg'
@@ -59,91 +60,119 @@ const initialOpions: Options = {
   squareShape: 'extra-rounded',
   squareColor: '#6a1a4c',
   cornersDotShape: 'dot',
-  cornersDotColor: '#dc3545',
+  cornersDotColor: '#dc3545'
 }
 
 const savedValues = localStorage.getItem('qr-code')
 const optionsValues: Options = savedValues ? JSON.parse(savedValues) : initialOpions
 
+declare type State = {
+  offcanvas: boolean
+}
+
+type Action = { type: 'offcanvas-toggle' } | { type: 'offcanvas-close' }
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'offcanvas-toggle':
+      return {
+        offcanvas: !state.offcanvas
+      }
+    case 'offcanvas-close':
+      return {
+        offcanvas: false
+      }
+    default:
+      return state
+  }
+}
+
 function App() {
   const { qrCode, canvasRef } = useContext(AppContext)
   const [options, setOptions] = useState(optionsValues)
-  const [isSave, setSave] = useState(false)
-  const [offcanvas, setOffcanvas] = useState(false)
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [{ offcanvas }, dispatch] = useReducer(reducer, {
+    offcanvas: false
+  })
+
   const offcanvasRef = useRef<HTMLInputElement>(null)
   const uploadRef = useRef<HTMLInputElement>(null)
+  const uploadError = useRef('')
 
-  const handleOptions = (event: React.ChangeEvent) => {
-    const { type, name, value, checked, files } = event.target as HTMLInputElement
+  const handleOptions = (event: React.ChangeEvent<HTMLInputElement & HTMLSelectElement>) => {
+    const { type, name, value, checked, files } = event.target
 
     setOptions((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : value
     }))
 
     if (!files) return
+
     const image = files[0]
+    uploadError.current = ''
 
     if (image) {
       // Check supported formats
       if (!image.type.match('image.*')) {
-        console.error('Error: File is not supported.')
-        setOptions((prev) => ({
-          ...prev,
-          image: defaultBrand,
-        }))
+        uploadError.current = 'Error: File is not supported.'
+        return
       }
 
-      // Check max size (1 M in Bytes)
+      // Check max size (2M in Bytes)
       if (image.size > 2097152) {
-        console.error('Error: Maximum file size is 2 MB')
-        setOptions((prev) => ({
-          ...prev,
-          image: defaultBrand,
-        }))
+        uploadError.current = 'Error: Maximum file size is 2 MB'
+        return
       }
 
       const fileReader = new FileReader()
+
+      fileReader.onerror = (err) => {
+        uploadError.current = `Failed: ${err}`
+      }
+
       fileReader.onload = () => {
         setOptions((prev) => ({
           ...prev,
-          image: fileReader.result as string,
+          image: fileReader.result as string
         }))
       }
       fileReader.readAsDataURL(image)
     }
   }
 
-  const handleOffcanvas = () => setOffcanvas((prev) => !prev)
+  const handleOffcanvas = () => dispatch({ type: 'offcanvas-toggle' })
 
-  const handleSave = () => {
-    setSave(true)
+  const handleSave = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget
+    button.innerText = 'Saving..'
+
+    setTimeout(() => {
+      button.innerText = 'Save Style'
+    }, 1000)
+
     localStorage.setItem('qr-code', JSON.stringify(options))
-    setTimeout(() => setSave(false), 500)
   }
 
   const handleSavedValues = () => {
-    const savedValues = localStorage.getItem('qr-code')
-
     if (savedValues) {
       setOptions(JSON.parse(savedValues))
     }
   }
 
-  const handleReset = () => {
-    setOptions(initialOpions)
+  const handleResetOptions = () => {
     if (uploadRef.current) {
       uploadRef.current.value = ''
     }
+    setOptions(initialOpions)
   }
 
   const handleResetImage = () => {
     if (uploadRef.current) {
       uploadRef.current.value = ''
+      uploadError.current = ''
       setOptions((prev) => ({
         ...prev,
-        image: defaultBrand,
+        image: defaultBrand
       }))
     }
   }
@@ -156,26 +185,26 @@ function App() {
       image,
       dotsOptions: {
         type: options.mainShape,
-        color: options.shapeColor,
+        color: options.shapeColor
       },
       cornersSquareOptions: {
         type: options.squareShape,
-        color: options.squareColor,
+        color: options.squareColor
       },
       cornersDotOptions: {
         type: options.cornersDotShape,
-        color: options.cornersDotColor,
+        color: options.cornersDotColor
       },
       imageOptions: {
-        margin: options.imageMargin,
-      },
+        margin: options.imageMargin
+      }
     })
   }, [qrCode, options])
 
   useEffect(() => {
     window.onclick = (event: MouseEvent) => {
       if (offcanvas && offcanvasRef.current) {
-        if (event.target === offcanvasRef.current) setOffcanvas(false)
+        if (event.target === offcanvasRef.current) dispatch({ type: 'offcanvas-close' })
       }
     }
   }, [offcanvas])
@@ -189,7 +218,7 @@ function App() {
           <div className='row flex-lg-row-reverse justify-content-between g-5 py-5'>
             <div className='col-12 col-md-4'>
               <div className='qr-code-container'>
-                <div className='qr-code text-center mx-auto' ref={canvasRef}></div>
+                <div className='qr-code text-center mx-auto' ref={canvasRef} />
                 <div className='customization'>
                   <div className='py-5'>
                     <input
@@ -219,9 +248,9 @@ function App() {
                   <div className='d-grid py-4'>
                     <div className='form-check form-switch'>
                       <input
+                        id='removeBrand'
                         className='form-check-input'
                         type='checkbox'
-                        id='removeBrand'
                         name='removeBrand'
                         checked={options.removeBrand}
                         onChange={handleOptions}
@@ -244,7 +273,7 @@ function App() {
                 surprise your firends!
               </h1>
               <p className='lead'>Generate a modern, styled and branded QR code for Free!</p>
-              <Tabs className='mt-5' selectedTab={selectedTab} onClick={setSelectedTab} tabs={tabs} type='pills' />
+              <Tabs className='mt-5' tabs={tabs} type='pills' />
             </div>
           </div>
         </div>
@@ -257,7 +286,7 @@ function App() {
       >
         <div className='offcanvas-header'>
           <h5 className='offcanvas-title'>Customization</h5>
-          <button type='button' className='btn-close text-reset' aria-label='Close' onClick={handleOffcanvas}></button>
+          <button type='button' className='btn-close text-reset' aria-label='Close' onClick={handleOffcanvas} />
         </div>
         <div className='offcanvas-body'>
           <div className='main-shape'>
@@ -396,16 +425,17 @@ function App() {
                     accept='.gif,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg'
                   />
 
-                  <span
+                  <button
                     className={`input-group-text${
                       uploadRef.current && uploadRef.current.value === '' ? ' disabled' : ''
                     }`}
                     onClick={handleResetImage}
-                    role='button'
+                    type='button'
                   >
                     &#x2715;
-                  </span>
+                  </button>
                 </div>
+                {uploadError.current && <span className='text-danger'>{uploadError.current}</span>}
                 <div className='form-text'>
                   Upload your own logo image as .png, .jpg, .gif or .svg file format with a maximum size of 2 MB.
                 </div>
@@ -433,19 +463,19 @@ function App() {
           <hr />
 
           <div className='d-grid gap-2 d-md-flex justify-content-md-end pt-4'>
-            <button className='btn btn-outline-danger me-auto' type='button' onClick={handleReset}>
+            <button className='btn btn-outline-danger me-auto' type='button' onClick={handleResetOptions}>
               Reset
             </button>
             <button className='btn btn-primary' type='button' onClick={handleSavedValues}>
               Load Saved Style
             </button>
             <button className='btn btn-success' type='button' onClick={handleSave}>
-              {isSave ? 'Saving..' : 'Save Style'}
+              Save Style
             </button>
           </div>
         </div>
       </div>
-      {offcanvas && <div ref={offcanvasRef} className={`modal-backdrop ${offcanvas ? 'fade show' : ''}`}></div>}
+      {offcanvas && <div ref={offcanvasRef} className={`modal-backdrop ${offcanvas ? 'fade show' : ''}`} />}
     </div>
   )
 }

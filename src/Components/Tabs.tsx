@@ -1,29 +1,41 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 
-type TabsProps = {
+declare type TabsProps = {
   className?: string
   tabs: {
     label: string
     Component: (T: { index: number }) => JSX.Element
   }[]
-  selectedTab: number
-  onClick: (index: number) => void
   orientation?: 'horizontal' | 'vertical'
   type?: 'tabs' | 'pills'
 }
 
-const Tabs = ({
-  className = 'tabs-component',
-  tabs = [],
-  selectedTab = 0,
-  onClick,
-  orientation = 'horizontal',
-  type = 'tabs',
-}: TabsProps): JSX.Element => {
-  const Panel = tabs && tabs.find((_, index) => index === selectedTab)
+declare type State = {
+  selected: number
+}
+
+type Action = { type: 'selected'; payload: number }
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'selected':
+      return {
+        selected: action.payload
+      }
+    default:
+      return state
+  }
+}
+
+const Tabs = ({ className = 'tabs-component', tabs = [], orientation = 'horizontal', type = 'tabs' }: TabsProps) => {
+  const [{ selected }, dispatch] = useReducer(reducer, {
+    selected: 0
+  })
+
+  const Panel = tabs && tabs.find((_, index) => index === selected)
 
   return (
-    <div className={`${orientation === 'vertical' ? 'd-flex align-items-start ' : ''}` + className}>
+    <div className={`${orientation === 'vertical' ? 'd-flex align-items-start ' : ''} ${className}`}>
       <div
         className={`nav${orientation === 'vertical' ? ' flex-column col-3 nav-pills me-4' : ` nav-${type} mb-4`}`}
         aria-orientation={orientation}
@@ -31,15 +43,15 @@ const Tabs = ({
       >
         {tabs.map((tab, index) => (
           <button
-            key={index}
+            key={tab.label}
             id={`tab-${index}`}
-            className={selectedTab === index ? 'nav-link active' : 'nav-link'}
+            className={selected === index ? 'nav-link active' : 'nav-link'}
             type='button'
             role='tab'
-            tabIndex={selectedTab === index ? 0 : -1}
-            aria-selected={selectedTab === index}
+            tabIndex={selected === index ? 0 : -1}
+            aria-selected={selected === index}
             aria-controls={`pane-${index}`}
-            onClick={() => onClick(index)}
+            onClick={() => dispatch({ type: 'selected', payload: index })}
           >
             {tab.label}
           </button>
@@ -48,12 +60,12 @@ const Tabs = ({
 
       <div className={`tab-content${orientation === 'vertical' ? ' col-9' : ''}`}>
         <div
-          id={`pane-${selectedTab}`}
+          id={`pane-${selected}`}
           className='tab-pane fade show active'
           role='tabpanel'
-          aria-labelledby={`tab-${selectedTab}`}
+          aria-labelledby={`tab-${selected}`}
         >
-          {Panel?.Component && <Panel.Component index={selectedTab} />}
+          {Panel?.Component && <Panel.Component index={selected} />}
         </div>
       </div>
     </div>

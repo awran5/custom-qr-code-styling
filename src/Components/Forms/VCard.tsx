@@ -16,41 +16,57 @@ const initialValues = {
   zip: '',
   state: '',
   country: '',
-  website: '',
+  website: ''
 }
 
-const VCardForm = (): JSX.Element => {
-  const [value, setValue] = useState(initialValues)
+const VCardForm = () => {
+  const [values, setValues] = useState(initialValues)
   const { qrCode } = useContext(AppContext)
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
-    setValue((prev) => ({
+    setValues((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    let data = 'BEGIN:VCARD\n'
-    data += 'VERSION:3.0\n'
-    data += 'N:' + value.lastName + ';' + value.firstName + '\n'
-    data += 'FN:' + value.firstName + ' ' + value.lastName + '\n'
-    data += 'ORG:' + value.company + '\n'
-    data += 'TITLE:' + value.job + '\n'
-    data +=
-      'ADR:;;' + value.street + ';' + value.city + ';' + value.state + ';' + value.zip + ';' + value.country + '\n'
-    data += 'TEL;WORK;VOICE:' + value.phone + '\n'
-    data += 'TEL;CELL:' + value.mobile + '\n'
-    data += 'TEL;FAX:' + value.fax + '\n'
-    data += 'EMAIL;WORK;INTERNET:' + value.email + '\n'
-    data += 'URL:' + value.website + '\n'
-    data += 'END:VCARD\n'
+    const {
+      firstName,
+      lastName,
+      company,
+      job,
+      mobile,
+      phone,
+      fax,
+      email,
+      street,
+      city,
+      zip,
+      state,
+      country,
+      website
+    } = values
+
+    const data = `BEGIN:VCARD
+VERSION:3.0
+N:${lastName};${firstName};;Mr.;
+FN:${firstName} ${lastName}
+ORG:${company}.
+TITLE:${job}
+TEL;TYPE#WORK,VOICE:${phone}
+TEL;TYPE#CELL,VOICE:${mobile}
+TEL;TYPE#FAX:${fax}
+ADR:;;${street};${city};${state};${zip};${country}
+EMAIL:${email}
+URL:${website}
+END:VCARD`
 
     qrCode.update({
-      data,
+      data
     })
   }
 
@@ -65,7 +81,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='firstName'
               placeholder='First Name'
-              value={value.firstName}
+              value={values.firstName}
               onChange={handleChange}
               required
             />
@@ -80,7 +96,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='lastName'
               placeholder='Last Name'
-              value={value.lastName}
+              value={values.lastName}
               onChange={handleChange}
             />
             <label htmlFor='lastName'>Last Name</label>
@@ -96,7 +112,7 @@ const VCardForm = (): JSX.Element => {
             type='text'
             name='mobile'
             placeholder='Mobile'
-            value={value.mobile}
+            value={values.mobile}
             onChange={handleChange}
           />
           <label htmlFor='mobile'>Mobile</label>
@@ -112,7 +128,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='phone'
               placeholder='Phone'
-              value={value.phone}
+              value={values.phone}
               onChange={handleChange}
             />
             <label htmlFor='phone'>Phone</label>
@@ -126,7 +142,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='fax'
               placeholder='Fax'
-              value={value.fax}
+              value={values.fax}
               onChange={handleChange}
             />
             <label htmlFor='fax'>Fax</label>
@@ -142,7 +158,7 @@ const VCardForm = (): JSX.Element => {
             type='email'
             name='email'
             placeholder='Email'
-            value={value.email}
+            value={values.email}
             onChange={handleChange}
           />
           <label htmlFor='email'>Email</label>
@@ -158,7 +174,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='company'
               placeholder='Company'
-              value={value.company}
+              value={values.company}
               onChange={handleChange}
             />
             <label htmlFor='company'>Company</label>
@@ -172,7 +188,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='job'
               placeholder='Your Job'
-              value={value.job}
+              value={values.job}
               onChange={handleChange}
             />
             <label htmlFor='job'>Job</label>
@@ -188,7 +204,7 @@ const VCardForm = (): JSX.Element => {
             type='text'
             name='street'
             placeholder='Street'
-            value={value.street}
+            value={values.street}
             onChange={handleChange}
           />
           <label htmlFor='street'>Street</label>
@@ -204,7 +220,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='city'
               placeholder='City'
-              value={value.city}
+              value={values.city}
               onChange={handleChange}
             />
             <label htmlFor='city'>City</label>
@@ -218,7 +234,7 @@ const VCardForm = (): JSX.Element => {
               type='text'
               name='zip'
               placeholder='Zip'
-              value={value.zip}
+              value={values.zip}
               onChange={handleChange}
             />
             <label htmlFor='zip'>Zip</label>
@@ -234,7 +250,7 @@ const VCardForm = (): JSX.Element => {
             type='text'
             name='state'
             placeholder='State'
-            value={value.state}
+            value={values.state}
             onChange={handleChange}
           />
           <label htmlFor='state'>State</label>
@@ -249,7 +265,7 @@ const VCardForm = (): JSX.Element => {
             type='text'
             name='country'
             placeholder='Country'
-            value={value.country}
+            value={values.country}
             onChange={handleChange}
           />
           <label htmlFor='country'>Country</label>
@@ -264,7 +280,7 @@ const VCardForm = (): JSX.Element => {
             type='url'
             name='website'
             placeholder='Website'
-            value={value.website}
+            value={values.website}
             onChange={handleChange}
           />
           <label htmlFor='website'>Website</label>

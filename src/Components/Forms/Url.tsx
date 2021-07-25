@@ -2,19 +2,19 @@ import React, { useState, useContext } from 'react'
 import { AppContext } from '../../Context'
 import Submit from '../Submit'
 
-function UrlForm(): JSX.Element {
-  const [value, setValue] = useState('')
+function UrlForm() {
+  const [values, setValues] = useState('')
   const { qrCode } = useContext(AppContext)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value)
+    setValues(event.target.value)
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     qrCode.update({
-      data: value,
+      data: values
     })
   }
 
@@ -26,7 +26,7 @@ function UrlForm(): JSX.Element {
           className='form-control'
           type='url'
           name='url'
-          value={value}
+          value={values}
           onChange={handleChange}
           placeholder='Add URL'
           required

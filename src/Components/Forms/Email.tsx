@@ -5,28 +5,30 @@ import Submit from '../Submit'
 const initialValues = {
   email: '',
   subject: '',
-  body: '',
+  body: ''
 }
 
-const EmailForm = (): JSX.Element => {
-  const [value, setValue] = useState(initialValues)
+const EmailForm = () => {
   const { qrCode } = useContext(AppContext)
+  const [values, setValues] = useState(initialValues)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
-    setValue((prev) => ({
+    setValues((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const data = `mailto:${value.email}?subject=${value.subject}&body=${value.body}`
+    const { email, subject, body } = values
+
+    const data = `mailto:${email}?subject=${subject}&body=${body}`
 
     qrCode.update({
-      data,
+      data
     })
   }
 
@@ -38,7 +40,7 @@ const EmailForm = (): JSX.Element => {
           className='form-control'
           type='email'
           name='email'
-          value={value.email}
+          value={values.email}
           onChange={handleChange}
           placeholder='Email'
           required
@@ -51,7 +53,7 @@ const EmailForm = (): JSX.Element => {
           className='form-control'
           type='text'
           name='subject'
-          value={value.subject}
+          value={values.subject}
           onChange={handleChange}
           placeholder='Subject'
         />
@@ -63,7 +65,7 @@ const EmailForm = (): JSX.Element => {
           className='form-control'
           name='body'
           rows={3}
-          value={value.body}
+          value={values.body}
           onChange={handleChange}
           placeholder='Message'
         />
